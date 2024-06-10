@@ -16,6 +16,9 @@ register_proto! {
 
     // Status Packets
     StatusRequestPacket => (0x00, Status, Serverbound),
+    StatusResponsePacket => (0x00, Status, Clientbound), {
+        response: String
+    },
     
     // Login Packets
     LoginStartPacket => (0x00, Login, Serverbound), {
@@ -59,7 +62,7 @@ impl Deserializer<LoginStartPacket> for LoginStartPacket {
 }
 
 impl Deserializer<StatusRequestPacket> for StatusRequestPacket {
-    fn deserialize(buf: &mut ByteBuf) -> DeserializerResult<StatusRequestPacket> {
+    fn deserialize(_buf: &mut ByteBuf) -> DeserializerResult<StatusRequestPacket> {
         Ok(StatusRequestPacket {})
     }
 }

@@ -1,3 +1,5 @@
+#[warn(unreachable_patterns)]
+
 #[macro_export]
 macro_rules! register_proto {
     {
@@ -30,15 +32,15 @@ macro_rules! register_proto {
             }
         )*
 
-        pub fn $handle_name(state: &ConnectionState, packet_id: i32, buffer: &mut ByteBuf) -> Option<Box<dyn Packet>> {
+        pub fn $handle_name(state: &ConnectionState, direction: PacketDirection, packet_id: i32, buffer: &mut ByteBuf) -> Option<Box<dyn Packet>> {
             match (state, packet_id) {
                 $(
                     (ConnectionState::$client_state, $packet_id) => {
                         let serialized = $packet_name::deserialize(buffer).unwrap();
                         Some(Box::new(serialized))
-                    },
-                    _ => None
+                    }
                 ),*
+                _ => None
             }
         }
     };

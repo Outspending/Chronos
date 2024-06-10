@@ -22,6 +22,16 @@ macro_rules! register_buffer {
                 }
             }
 
+            pub fn new_empty() -> Self {
+                $name {
+                    buf: Cursor::new(Vec::new())
+                }
+            }
+
+            pub fn bytes(&self) -> Vec<u8> {
+                self.buf.get_ref().clone()
+            }
+
             pub fn read<T: FromNetwork<T>>(&mut self) -> T {
                 T::from_network(self)
             }

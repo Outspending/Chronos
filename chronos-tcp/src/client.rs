@@ -1,6 +1,6 @@
-use chronos_buffer::{buffer::ByteBuf, ConnectionState};
-use chronos_packet::client::ClientInformation;
-use tokio::{io::AsyncReadExt, net::TcpStream};
+use chronos_buffer::{buffer::ByteBuf, network::ToNetwork};
+use chronos_packet::{client::ClientInformation, Packet};
+use tokio::{io::{AsyncReadExt, AsyncWriteExt}, net::TcpStream};
 
 #[derive(Debug)]
 pub struct ClientConnection {
@@ -35,8 +35,7 @@ impl ClientConnection {
             println!("Data: {:?}", data);
 
             let mut buffer = ByteBuf::new(data);
-            buffer.read_varint();
-
+            let packet_length = buffer.read_varint();
             let packet_id = buffer.read_varint();
 
             let state = self.info.state;
@@ -44,8 +43,17 @@ impl ClientConnection {
             if let Some(serialized_packet) = chronos_packet::v1_20_6::handle_packet(&state, *packet_id, &mut buffer) {
                 println!("[{:?}] Packet: {:?}", state, serialized_packet);
                 serialized_packet.handle(&mut self.info);
+            } else {
+                println!("[{:?}] Unknown Packet ID: {}", state, *packet_id);
             }
         }
+    }
+
+    pub async fn send_packet<T: Packet + ToNetwork<T>>(&mut self, packet: &T) {
+        let mut buffer = ByteBuf::new_empty();
+        buffer.write(packet);
+
+        self.stream.write_all(buffer.bytes().as_slice()).await.unwrap();
     }
 
 }
