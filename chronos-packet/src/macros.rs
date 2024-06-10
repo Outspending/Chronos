@@ -1,6 +1,4 @@
-use crate::{client::ClientInformation, deserializer::{Deserializer, DeserializerResult}, Handleable, Packet, PacketDirection};
-use chronos_buffer::{buffer::ByteBuf, types::VarInt, ConnectionState};
-
+#[macro_export]
 macro_rules! register_proto {
     {
         $handle_name:ident,
@@ -44,33 +42,4 @@ macro_rules! register_proto {
             }
         }
     };
-}
-
-register_proto! {
-    handle_packet,
-
-    // Handshaking Packets
-    HandshakePacket => (0x00, Handshake, Serverbound), {
-        protocol_version: VarInt,
-        server_address: String,
-        server_port: u16,
-        next_state: ConnectionState
-    },
-}
-
-impl Handleable for HandshakePacket {
-    fn handle(&self, info: &mut ClientInformation) {
-        info.state = self.next_state;
-    }
-}
-
-impl Deserializer<HandshakePacket> for HandshakePacket {
-    fn deserialize(buf: &mut ByteBuf) -> DeserializerResult<HandshakePacket> {
-        Ok(HandshakePacket {
-            protocol_version: buf.read_varint(),
-            server_address: buf.read_string(),
-            server_port: buf.read_short(),
-            next_state: ConnectionState::from(*buf.read_varint()),
-        })
-    }
 }

@@ -41,7 +41,7 @@ impl ClientConnection {
 
             let state = self.info.state;
             
-            if let Some(serialized_packet) = chronos_packet::macros::handle_packet(&state, *packet_id, &mut buffer) {
+            if let Some(serialized_packet) = chronos_packet::v1_20_6::handle_packet(&state, *packet_id, &mut buffer) {
                 println!("[{:?}] Packet: {:?}", state, serialized_packet);
                 serialized_packet.handle(&mut self.info);
             }

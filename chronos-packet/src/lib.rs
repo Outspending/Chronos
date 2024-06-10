@@ -6,6 +6,7 @@ pub mod deserializer;
 pub mod serializer;
 pub mod macros;
 pub mod client;
+pub mod v1_20_6;
 
 pub enum PacketDirection {
     Clientbound,

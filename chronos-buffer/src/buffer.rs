@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use crate::{network::{FromNetwork, ToNetwork}, types::{Identifier, Position, VarInt, VarLong}};
 use std::io::{Cursor, Write, Read};
 
@@ -10,7 +12,7 @@ macro_rules! register_buffer {
     } => {
         #[derive(Debug, Clone)]
         pub struct $name {
-            pub buf: Cursor<Vec<u8>>
+            pub(crate) buf: Cursor<Vec<u8>>
         }
 
         impl $name {
@@ -60,6 +62,7 @@ register_buffer! {
     u16 => (read_short, write_short),
     u32 => (read_int, write_int),
     u64 => (read_long, write_long),
+    Uuid => (read_uuid, write_uuid),
     String => (read_string, write_string),
     Position => (read_position, write_position),
     Identifier => (read_identifier, write_identifier),

@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 thiserror = "*"
+uuid = "*"
 chronos-buffer = { path = "../chronos-buffer" }

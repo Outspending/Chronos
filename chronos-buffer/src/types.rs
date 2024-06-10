@@ -1,6 +1,7 @@
 use std::{io::{Read, Write}, ops::Deref};
 use lazy_static::lazy_static;
 use regex::Regex;
+use uuid::Uuid;
 
 use crate::{buffer::ByteBuf, network::{FromNetwork, ToNetwork}};
 use std::convert::From;
@@ -145,6 +146,20 @@ impl Identifier {
         } else {
             Some(Identifier { namespace, path })
         }
+    }
+}
+
+impl FromNetwork<Uuid> for Uuid {
+    fn from_network(buf: &mut ByteBuf) -> Uuid {
+        let mut buffer = [0; 16];
+        buf.buf.read(&mut buffer).unwrap();
+        Uuid::from_bytes(buffer)
+    }
+}
+
+impl ToNetwork<Uuid> for Uuid {
+    fn to_network(&self, buf: &mut ByteBuf) {
+        buf.buf.write(self.as_bytes()).unwrap();
     }
 }
 
