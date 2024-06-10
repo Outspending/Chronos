@@ -1,4 +1,4 @@
-use crate::{deserializer::{Deserializer, DeserializerResult}, Packet, PacketDirection};
+use crate::{client::ClientInformation, deserializer::{Deserializer, DeserializerResult}, Handleable, Packet, PacketDirection};
 use chronos_buffer::{buffer::ByteBuf, types::VarInt, ConnectionState};
 
 macro_rules! register_proto {
@@ -56,6 +56,12 @@ register_proto! {
         server_port: u16,
         next_state: ConnectionState
     },
+}
+
+impl Handleable for HandshakePacket {
+    fn handle(&self, info: &mut ClientInformation) {
+        info.state = self.next_state;
+    }
 }
 
 impl Deserializer<HandshakePacket> for HandshakePacket {

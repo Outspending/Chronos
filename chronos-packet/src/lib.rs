@@ -1,8 +1,11 @@
 use std::fmt::Debug;
 
+use client::ClientInformation;
+
 pub mod deserializer;
 pub mod serializer;
 pub mod macros;
+pub mod client;
 
 pub enum PacketDirection {
     Clientbound,
@@ -25,7 +28,11 @@ impl PacketDirection {
     }
 }
 
-pub trait Packet: Debug {
+pub trait Packet: Handleable + Debug {
     fn id(&self) -> i32;
     fn direction(&self) -> PacketDirection;
+}
+
+pub trait Handleable {
+    fn handle(&self, info: &mut ClientInformation);
 }
