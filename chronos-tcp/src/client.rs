@@ -1,6 +1,8 @@
 use chronos_buffer::{buffer::ByteBuf, ConnectionState};
 use tokio::{io::AsyncReadExt, net::TcpStream};
 
+use crate::handler::PacketHandler;
+
 #[derive(Debug)]
 pub struct ClientConnection {
     stream: TcpStream,
@@ -31,7 +33,11 @@ impl ClientConnection {
             buffer.read_varint();
 
             let packet_id = buffer.read_varint();
-            println!("Packet ID: {:?}", packet_id);
+            let packet = chronos_packet::macros::handle_packet(&self.state, *packet_id, &mut buffer);
+            if let Some(serialized_packet) = packet {
+                println!("[{:?}] Packet: {:?}", self.state, serialized_packet);
+                PacketHandler::handle_packet(serialized_packet);
+            }
         }
     }
 }

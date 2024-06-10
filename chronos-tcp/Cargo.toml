@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 tokio = { version = "*", features = ["full"] }
 chronos-buffer = { path = "../chronos-buffer" }
+chronos-packet = { path = "../chronos-packet" }

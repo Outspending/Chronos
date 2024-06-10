@@ -14,7 +14,7 @@ macro_rules! register_varnum {
     ( $name:ident, $type:ty, $working_type:ty, $max_size:literal ) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
         pub struct $name(pub $type);
-
+        
         impl Deref for $name {
             type Target = $type;
 
@@ -163,56 +163,56 @@ impl ToNetwork<bool> for bool {
 impl FromNetwork<u8> for u8 {
     fn from_network(buf: &mut ByteBuf) -> u8 {
         let mut buffer = [0; 1];
-        buf.buf.read_exact(&mut buffer).unwrap();
+        buf.buf.read(&mut buffer).unwrap();
         buffer[0]
     }
 }
 
 impl ToNetwork<u8> for u8 {
     fn to_network(&self, buf: &mut ByteBuf) {
-        buf.buf.write_all(&[*self]).unwrap();
+        buf.buf.write(&[*self]).unwrap();
     }
 }
 
 impl FromNetwork<u16> for u16 {
     fn from_network(buf: &mut ByteBuf) -> u16 {
         let mut buffer = [0; 2];
-        buf.buf.read_exact(&mut buffer).unwrap();
+        buf.buf.read(&mut buffer).unwrap();
         u16::from_be_bytes(buffer)
     }
 }
 
 impl ToNetwork<u16> for u16 {
     fn to_network(&self, buf: &mut ByteBuf) {
-        buf.buf.write_all(&self.to_be_bytes()).unwrap();
+        buf.buf.write(&self.to_be_bytes()).unwrap();
     }
 }
 
 impl FromNetwork<u32> for u32 {
     fn from_network(buf: &mut ByteBuf) -> u32 {
         let mut buffer = [0; 4];
-        buf.buf.read_exact(&mut buffer).unwrap();
+        buf.buf.read(&mut buffer).unwrap();
         u32::from_be_bytes(buffer)
     }
 }
 
 impl ToNetwork<u32> for u32 {
     fn to_network(&self, buf: &mut ByteBuf) {
-        buf.buf.write_all(&self.to_be_bytes()).unwrap();
+        buf.buf.write(&self.to_be_bytes()).unwrap();
     }
 }
 
 impl FromNetwork<u64> for u64 {
     fn from_network(buf: &mut ByteBuf) -> u64 {
         let mut buffer = [0; 8];
-        buf.buf.read_exact(&mut buffer).unwrap();
+        buf.buf.read(&mut buffer).unwrap();
         u64::from_be_bytes(buffer)
     }
 }
 
 impl ToNetwork<u64> for u64 {
     fn to_network(&self, buf: &mut ByteBuf) {
-        buf.buf.write_all(&self.to_be_bytes()).unwrap();
+        buf.buf.write(&self.to_be_bytes()).unwrap();
     }
 }
 

@@ -1,5 +1,4 @@
-use deserializer::Deserializer;
-use serializer::Serializer;
+use std::fmt::Debug;
 
 pub mod deserializer;
 pub mod serializer;
@@ -17,11 +16,16 @@ impl PacketDirection {
             PacketDirection::Serverbound => PacketDirection::Clientbound
         }
     }
+
+    pub fn get(name: &str) -> PacketDirection {
+        match name.to_lowercase().as_str() {
+            "serverbound" => PacketDirection::Serverbound,
+            _ => PacketDirection::Clientbound
+        }
+    }
 }
 
-pub trait Packet<T> {
+pub trait Packet: Debug {
     fn id(&self) -> i32;
+    fn direction(&self) -> PacketDirection;
 }
-
-pub trait ClientboundPacket<T>: Packet<T> + Serializer {}
-pub trait ServerboundPacket<T>: Packet<T> + Deserializer<T> {}
