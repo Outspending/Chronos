@@ -1,0 +1,11 @@
+[package]
+name = "Chronos"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [ "chronos-buffer" , "chronos-packet", "chronos-tcp" ]
+
+[dependencies]
+tokio = { version = "*", features = ["full"] }
+chronos-tcp = { path = "chronos-tcp" }

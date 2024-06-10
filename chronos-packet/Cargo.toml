@@ -1,0 +1,8 @@
+[package]
+name = "chronos-packet"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror = "*"
+chronos-buffer = { path = "../chronos-buffer" }
