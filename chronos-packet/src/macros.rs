@@ -1,5 +1,4 @@
 #[warn(unreachable_patterns)]
-
 #[macro_export]
 macro_rules! register_proto {
     {

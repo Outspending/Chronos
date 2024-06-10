@@ -6,7 +6,7 @@ pub enum SerializerError {
     #[error("Invalid packet ID")]
     InvalidPacket,
     #[error("Invalid packet format")]
-    Unknown
+    Unknown,
 }
 
 pub type SerializerResult<T> = Result<T, SerializerError>;

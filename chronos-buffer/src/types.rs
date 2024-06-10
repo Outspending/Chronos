@@ -1,9 +1,15 @@
-use std::{io::{Read, Write}, ops::Deref};
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::{
+    io::{Read, Write},
+    ops::Deref,
+};
 use uuid::Uuid;
 
-use crate::{buffer::ByteBuf, network::{FromNetwork, ToNetwork}};
+use crate::{
+    buffer::ByteBuf,
+    network::{FromNetwork, ToNetwork},
+};
 use std::convert::From;
 
 lazy_static! {
@@ -15,7 +21,7 @@ macro_rules! register_varnum {
     ( $name:ident, $type:ty, $working_type:ty, $max_size:literal ) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
         pub struct $name(pub $type);
-        
+
         impl Deref for $name {
             type Target = $type;
 
@@ -66,6 +72,23 @@ macro_rules! register_varnum {
                 }
             }
         }
+
+        impl $name {
+            pub fn get_size_in_bytes(&self) -> usize {
+                let mut value = self.0;
+                let mut size: usize = 0;
+                loop {
+                    size += 1;
+                    if (value & !0x7F) == 0 {
+                        break;
+                    }
+
+                    value >>= 7;
+                }
+
+                size
+            }
+        }
     };
 }
 
@@ -83,16 +106,20 @@ impl FromNetwork<Position> for Position {
     fn from_network(buf: &mut ByteBuf) -> Position {
         let val = buf.read_long();
         Position::new(
-            (val >> 38) as i32, 
-            (val << 52 >> 52) as i32, 
-            (val << 26 >> 38) as i32
+            (val >> 38) as i32,
+            (val << 52 >> 52) as i32,
+            (val << 26 >> 38) as i32,
         )
     }
 }
 
 impl ToNetwork<Position> for Position {
     fn to_network(&self, buf: &mut ByteBuf) {
-        buf.write_long((((self.x & 0x3FFFFFF) as u64) << 38) | (((self.z & 0x3FFFFFF) as u64) << 12) | (self.y & 0xFFF) as u64)
+        buf.write_long(
+            (((self.x & 0x3FFFFFF) as u64) << 38)
+                | (((self.z & 0x3FFFFFF) as u64) << 12)
+                | (self.y & 0xFFF) as u64,
+        )
     }
 }
 

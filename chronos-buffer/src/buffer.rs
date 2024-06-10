@@ -1,7 +1,10 @@
 use uuid::Uuid;
 
-use crate::{network::{FromNetwork, ToNetwork}, types::{Identifier, Position, VarInt, VarLong}};
-use std::io::{Cursor, Write, Read};
+use crate::{
+    network::{FromNetwork, ToNetwork},
+    types::{Identifier, Position, VarInt, VarLong},
+};
+use std::io::{Cursor, Read, Write};
 
 macro_rules! register_buffer {
     {
@@ -16,40 +19,6 @@ macro_rules! register_buffer {
         }
 
         impl $name {
-            pub fn new(data: &[u8]) -> Self {
-                $name {
-                    buf: Cursor::new(data.to_vec())
-                }
-            }
-
-            pub fn new_empty() -> Self {
-                $name {
-                    buf: Cursor::new(Vec::new())
-                }
-            }
-
-            pub fn bytes(&self) -> Vec<u8> {
-                self.buf.get_ref().clone()
-            }
-
-            pub fn read<T: FromNetwork<T>>(&mut self) -> T {
-                T::from_network(self)
-            }
-
-            pub fn write<T: ToNetwork<T>>(&mut self, value: &T) {
-                value.to_network(self);
-            }
-
-            pub fn read_array(&mut self, length: usize) -> Vec<u8> {
-                let mut buffer = vec![0_u8; length];
-                self.buf.read_exact(&mut buffer).unwrap();
-                buffer
-            }
-
-            pub fn write_array(&mut self, buffer: &[u8]) {
-                self.buf.write_all(buffer).unwrap();
-            }
-
             $(
                 pub fn $buffer_read(&mut self) -> $buffer_type {
                     self.read::<$buffer_type>()
@@ -61,6 +30,55 @@ macro_rules! register_buffer {
             )*
 
         }
+    }
+}
+
+impl ByteBuf {
+    pub fn new(data: &[u8]) -> Self {
+        Self {
+            buf: Cursor::new(data.to_vec()),
+        }
+    }
+
+    pub fn new_empty() -> Self {
+        Self {
+            buf: Cursor::new(Vec::new()),
+        }
+    }
+
+    pub fn from_packet<T: Packet + ToNetwork<T>>(packet_length: i32, packet_id: i32, packet: &T) -> Self {
+        let mut buf = ByteBuf::new_empty();
+        buf.write_varint(VarInt::from(packet_length));
+        buf.write_varint(VarInt::from(packet_id));
+        buf.write(packet);
+        
+        buf
+    }
+
+    pub fn size(&self) -> usize {
+        self.buf.get_ref().len()
+    }
+
+    pub fn bytes(&self) -> Vec<u8> {
+        self.buf.get_ref().clone()
+    }
+
+    pub fn read<T: FromNetwork<T>>(&mut self) -> T {
+        T::from_network(self)
+    }
+
+    pub fn write<T: ToNetwork<T>>(&mut self, value: &T) {
+        value.to_network(self);
+    }
+
+    pub fn read_array(&mut self, length: usize) -> Vec<u8> {
+        let mut buffer = vec![0_u8; length];
+        self.buf.read_exact(&mut buffer).unwrap();
+        buffer
+    }
+
+    pub fn write_array(&mut self, buffer: &[u8]) {
+        self.buf.write_all(buffer).unwrap();
     }
 }
 

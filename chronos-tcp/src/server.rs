@@ -9,10 +9,10 @@ pub struct ServerConnection {
 
 impl ServerConnection {
     pub async fn new(addr: &str, port: u16) -> Self {
-        let listener = TcpListener::bind(format!("{}:{}", addr, port)).await.unwrap();
-        ServerConnection {
-            listener,
-        }
+        let listener = TcpListener::bind(format!("{}:{}", addr, port))
+            .await
+            .unwrap();
+        ServerConnection { listener }
     }
 
     pub async fn start(&mut self) {

@@ -1,7 +1,11 @@
 use chronos_buffer::{buffer::ByteBuf, types::VarInt, ConnectionState};
 use uuid::Uuid;
 
-use crate::{client::ClientInformation, deserializer::{Deserializer, DeserializerResult}, register_proto, Handleable, Packet, PacketDirection};
+use crate::{
+    client::ClientInformation,
+    deserializer::{Deserializer, DeserializerResult},
+    register_proto, Handleable, Packet, PacketDirection,
+};
 
 register_proto! {
     handle_packet,
@@ -16,10 +20,7 @@ register_proto! {
 
     // Status Packets
     StatusRequestPacket => (0x00, Status, Serverbound),
-    StatusResponsePacket => (0x00, Status, Clientbound), {
-        response: String
-    },
-    
+
     // Login Packets
     LoginStartPacket => (0x00, Login, Serverbound), {
         username: String,

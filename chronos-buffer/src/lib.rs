@@ -1,6 +1,6 @@
 pub mod buffer;
-pub mod types;
 pub mod network;
+pub mod types;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ConnectionState {
@@ -10,7 +10,7 @@ pub enum ConnectionState {
     Login = 2,
     Transfer = 3,
     Configuration = 4,
-    Play = 5
+    Play = 5,
 }
 
 impl From<i32> for ConnectionState {
@@ -21,7 +21,7 @@ impl From<i32> for ConnectionState {
             3 => ConnectionState::Transfer,
             4 => ConnectionState::Configuration,
             5 => ConnectionState::Play,
-            _ => ConnectionState::Handshake
+            _ => ConnectionState::Handshake,
         }
     }
 }

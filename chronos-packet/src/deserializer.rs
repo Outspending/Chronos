@@ -8,7 +8,7 @@ pub enum DeserializerError {
     #[error("Invalid packet format")]
     InvalidPacketFormat,
     #[error("Invalid packet data")]
-    Unknown
+    Unknown,
 }
 
 pub type DeserializerResult<T> = Result<T, DeserializerError>;
