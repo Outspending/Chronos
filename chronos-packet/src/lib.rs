@@ -8,6 +8,7 @@ pub mod macros;
 pub mod serializer;
 pub mod v1_20_6;
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum PacketDirection {
     Clientbound,
     Serverbound,

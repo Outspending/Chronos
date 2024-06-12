@@ -46,21 +46,20 @@ impl ByteBuf {
         }
     }
 
-    pub fn from_packet<T: Packet + ToNetwork<T>>(packet_length: i32, packet_id: i32, packet: &T) -> Self {
-        let mut buf = ByteBuf::new_empty();
-        buf.write_varint(VarInt::from(packet_length));
-        buf.write_varint(VarInt::from(packet_id));
-        buf.write(packet);
-        
-        buf
+    pub fn get_ref(&self) -> &Vec<u8> {
+        self.buf.get_ref()
+    }
+
+    pub fn get_mut(&mut self) -> &mut Vec<u8> {
+        self.buf.get_mut()
     }
 
     pub fn size(&self) -> usize {
-        self.buf.get_ref().len()
+        self.get_ref().len()
     }
 
     pub fn bytes(&self) -> Vec<u8> {
-        self.buf.get_ref().clone()
+        self.get_ref().clone()
     }
 
     pub fn read<T: FromNetwork<T>>(&mut self) -> T {

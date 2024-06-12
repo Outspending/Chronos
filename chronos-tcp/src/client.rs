@@ -58,16 +58,21 @@ impl ClientConnection {
     }
 
     pub async fn send_packet<T: Packet + ToNetwork<T>>(&mut self, packet: &T) {
-        let mut buffer = ByteBuf::new_empty();
-        buffer.write(packet);
+        if packet.direction() == PacketDirection::Clientbound {
+            let mut buffer = ByteBuf::new_empty();
+            let id = VarInt::from(packet.id());
+            buffer.write_varint(id);
+            buffer.write(packet);
 
-        let packet_length = buffer.size() + id.get_size_in_bytes();
-        let packet_id = VarInt::from(packet.id());
+            let length = VarInt::from(buffer.size() as i32);
+            buffer.write_varint(length);
+            buffer.get_mut().rotate_right(*length as usize);
 
-        buffer = ByteBuf::from_packet(packet_length, packet_id, packet);
-        self.stream
-            .write_all(buffer.bytes().as_slice())
-            .await
-            .unwrap();
+            println!("Buffer: {:?}", buffer.get_ref());
+            self.stream
+                .write_all(buffer.bytes().as_slice())
+                .await
+                .unwrap();
+        }
     }
 }

@@ -4,14 +4,14 @@ use uuid::Uuid;
 use crate::{
     client::ClientInformation,
     deserializer::{Deserializer, DeserializerResult},
-    register_proto, Handleable, Packet, PacketDirection,
+    register_serverbound_proto, Handleable, Packet, PacketDirection,
 };
 
-register_proto! {
+register_serverbound_proto! {
     handle_packet,
 
     // Handshaking Packets
-    HandshakePacket => (0x00, Handshake, Serverbound), {
+    HandshakePacket => (0x00, Handshake), {
         protocol_version: VarInt,
         server_address: String,
         server_port: u16,
@@ -19,10 +19,10 @@ register_proto! {
     },
 
     // Status Packets
-    StatusRequestPacket => (0x00, Status, Serverbound),
+    StatusRequestPacket => (0x00, Status),
 
     // Login Packets
-    LoginStartPacket => (0x00, Login, Serverbound), {
+    LoginStartPacket => (0x00, Login), {
         username: String,
         uuid: Uuid
     },
@@ -30,7 +30,13 @@ register_proto! {
 
 impl Handleable for HandshakePacket {
     fn handle(&self, info: &mut ClientInformation) {
-        info.state = self.next_state;
+        let state = self.next_state;
+        match state {
+            ConnectionState::Status | ConnectionState::Login | ConnectionState::Transfer => {
+                info.state = state;
+            }
+            _ => (),
+        }
     }
 }
 
